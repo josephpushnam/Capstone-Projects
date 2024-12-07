@@ -88,7 +88,7 @@ Feel free to explore and reach out if you'd like to discuss the project or share
 
 ### Connect with Me  
 
-<img src="https://github.com/user-attachments/assets/f93c176e-6343-4059-b163-708f9e07c329" alt="emoji" style="width: 2em; height: 1em; vertical-align: middle;"> **Email**: [josephpushnam@gmail.com](mailto:josephpushnam@gmail.com)  
+<img src="https://github.com/user-attachments/assets/f93c176e-6343-4059-b163-708f9e07c329" alt="emoji" style="width: 1.3em; height: 1em; vertical-align: middle;"> **Email**: [josephpushnam@gmail.com](mailto:josephpushnam@gmail.com)  
 <img src="https://github.com/user-attachments/assets/5faf05be-d861-4325-852d-608701e5e025" alt="emoji" style="width: 1em; height: 1em; vertical-align: middle;"> **LinkedIn**: [linkedin.com/in/joseph-pushnam](https://linkedin.com/in/joseph-pushnam)  
 
 
