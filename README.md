@@ -10,6 +10,8 @@ Welcome to my GitHub portfolio! This repository showcases the capstone projects 
 
 ## Featured Project: **Home Credit Default Risk**  
 
+To access more details about this dataset, you can visit the Kaggle site hosted by Home Credit [here](https://www.kaggle.com/competitions/home-credit-default-risk/data)
+
 # Home Credit Default Risk Analysis
 
 ## Summary of the Business Problem and Project Objective
