@@ -18,6 +18,9 @@ To access more details about this dataset, you can visit the Kaggle site hosted 
 The goal of this project is to predict loan repayment defaults, which is crucial for financial institutions aiming to minimize risks and extend credit responsibly. Using a dataset with diverse client features, such as age, income, and credit details, the project focuses on building machine learning models to predict the likelihood of default. The target variable (`TARGET`) is binary, with 0 indicating no default and 1 indicating default. Exploratory analysis revealed significant patterns in features like `DAYS_BIRTH` (age), `AMT_INCOME_TOTAL` (income), and `NAME_CONTRACT_TYPE`, highlighting their potential predictive power. For example, clients with longer `DAYS_BIRTH` (indicating older age) showed a lower likelihood of default.
 
 ---
+# Resources used:
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![R](https://img.shields.io/badge/r-%23276DC3.svg?style=for-the-badge&logo=r&logoColor=white) ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
+
 
 ## Group's Solution to the Business Problem
 The project used a systematic approach to preprocessing and modeling. Missing data, particularly in critical features such as `OWN_CAR_AGE` and `AMT_ANNUITY`, was addressed through imputation methods. Feature transformations were applied, including converting `DAYS_BIRTH` into `age_years`, to enhance model interpretability.
