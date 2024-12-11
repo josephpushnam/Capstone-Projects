@@ -1,0 +1,257 @@
+---
+title: "EDA - Practice Project"
+author: "Joseph Pushnam"
+date: "2024-09-29"
+output: 
+  html_document:
+    number_sections: yes
+    toc: yes
+editor_options: 
+  chunk_output_type: inline
+---
+
+### **Introduction: Statement of the Business and Analytic Problems**
+
+The primary objective of this project is to predict loan default risk using data from loan applicants, helping the business to make informed decisions and mitigate financial risk associated with loan approvals. The dataset includes various demographic, financial, and loan-specific features, and the target variable (`TARGET`) indicates whether an applicant has defaulted on their loan (`1` for default, `0` for no default).
+
+To understand the data and its potential for predictive modeling, the following key questions are addressed in the Exploratory Data Analysis (EDA):
+
+#### **Questions Addressed in the EDA:**
+
+**Is the target variable (loan default) imbalanced, and what would be the accuracy of a simple majority class classifier?**
+
+```         
+-   This question explores whether the target variable is imbalanced, which is important for deciding whether any balancing techniques (e.g., oversampling or undersampling) will be needed. We also calculate the accuracy of a simple model that always predicts the majority class, serving as a baseline for future modeling efforts.
+```
+
+**What is the relationship between the target and the predictors? Are there potentially strong predictors that could be included in a model?**
+
+```         
+-   We investigate correlations and other relationships between the target and key predictors, looking for features that may strongly influence loan default. Identifying strong predictors at this stage helps in feature selection and engineering for future modeling.
+```
+
+**How can the `skimr` and `janitor` packages in R assist with data exploration and cleaning?**
+
+```         
+-   The `skimr` package provides useful data summaries, including information on data types, missing values, and basic statistics. The `janitor` package helps streamline data cleaning by removing empty rows/columns and renaming columns. These tools are used throughout the EDA to simplify and enhance data exploration and preparation.
+```
+
+**What is the scope of missing data, and what are the possible solutions? Should we remove rows, remove columns, or impute missing values?**
+
+```         
+-   Missing data can impact model accuracy if not handled appropriately. We explore the extent of missing data across the dataset and consider different strategies to address it, such as removing rows or columns, or using imputation methods like mean/median imputation for numeric variables or mode imputation for categorical variables.
+```
+
+### **Brief Exploratory Data Analysis**
+
+#### **Checking for Class Imbalance:**
+
+```{r setup}
+# Set CRAN mirror
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+# Load libraries
+library(dplyr)
+library(skimr)
+library(janitor)
+library(ggplot2)
+
+# Set working directory
+setwd("C:\\Users\\Joseph\\OneDrive\\Desktop\\UoU\\DB_R\\3. Fall 2024\\Practice Project")
+
+# Read the dataset
+train_data <- read.csv("application_train.csv")
+
+# Count of target classes
+table(train_data$TARGET)
+
+# Plotting the distribution
+ggplot(train_data, aes(x = as.factor(TARGET))) +
+  geom_bar(fill = "blue", alpha = 0.7) +
+  labs(title = "Target Variable Distribution", x = "Target", y = "Count")
+
+# Summary of the data
+summary(train_data)
+
+```
+
+#### **Majority Class Classifier Accuracy:**
+
+##### Correlation with Numeric Variables: You can use cor() for a quick look at correlations between the numeric features and the target.
+
+```{r Majority Class Classifier Accuracy}
+majority_class <- max(table(train_data$TARGET)) / nrow(train_data)
+majority_class # This will give the accuracy of a simple majority class model
+```
+
+#### **Explore the Relationship Between Target and Predictors**
+
+##### Correlation with Numeric Variables: You can use cor() for a quick look at correlations between the numeric features and the target.
+
+```{r Relationship between target and Predictors I}
+numeric_columns <- sapply(train_data, is.numeric)
+cor_matrix <- cor(train_data[, numeric_columns], use = "complete.obs")
+cor_target <- cor_matrix[, "TARGET"]
+print(cor_target[order(-abs(cor_target))])  # Sorted by strength of correlation
+```
+
+##### Exploring Strong Predictors: You can also visualize potential strong predictors with scatter plots:
+
+```{r Relationship between target and Predictors II}
+ggplot(train_data, aes(x = AMT_CREDIT, y = TARGET)) +
+  geom_point() +
+  labs(title = "AMT_CREDIT vs TARGET", x = "Credit Amount", y = "Target")
+
+
+# Install and load the scales package if not already installed
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Bin the AMT_CREDIT values into ranges
+train_data <- train_data %>%
+  mutate(AMT_CREDIT_BIN = cut(AMT_CREDIT, 
+                              breaks = seq(0, max(AMT_CREDIT, na.rm = TRUE), by = 500000), 
+                              include.lowest = TRUE,
+                              labels = paste0(
+                                format(seq(0, max(AMT_CREDIT, na.rm = TRUE) - 500000, by = 500000), big.mark = ","),
+                                " to ",
+                                format(seq(500000, max(AMT_CREDIT, na.rm = TRUE), by = 500000), big.mark = ",")
+                              )
+  ))
+
+# Create a bar plot with improved x-axis labels
+ggplot(train_data, aes(x = AMT_CREDIT_BIN, fill = as.factor(TARGET))) +
+  geom_bar(position = "dodge") +
+  labs(
+    title = "AMT_CREDIT Distribution by TARGET",
+    x = "Credit Amount Range",
+    y = "Count",
+    fill = "Target"
+  ) +
+  scale_y_continuous(labels = comma) + # Format y-axis with commas
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10), # Adjust x-axis text angle and size
+    axis.text.y = element_text(size = 10), # Adjust y-axis text size
+    plot.title = element_text(size = 14, face = "bold") # Adjust title size
+  )+
+  coord_flip() # Flip the coordinates to make it horizontal
+
+```
+
+#### **Missing Data Exploration**
+
+##### Setup to discover missing values
+
+```{r}
+
+# Identify columns with missing values in train_data
+missing_columns <- train_data %>%
+  select(where(~ any(is.na(.)))) 
+
+# Display the columns with missing values
+missing_columns
+
+# Get column names with missing values
+missing_column_names <- names(train_data)[colSums(is.na(train_data)) > 0]
+
+# Display the column names
+missing_column_names
+
+
+# Skim for a general overview
+skim(train_data)
+
+# Checking missing values
+library(dplyr)
+
+train_data %>%
+  summarise(across(everything(), ~ sum(is.na(.))))
+
+# Using janitor for a cleaner view of missing data
+train_data_clean <- train_data %>% remove_empty("cols")
+
+```
+
+```{r}
+# Removing columns with more than 50% missing values
+train_data <- train_data[, colMeans(is.na(train_data)) < 0.5]
+
+# Imputing with median
+train_data$AMT_INCOME_TOTAL[is.na(train_data$AMT_INCOME_TOTAL)] <- median(train_data$AMT_INCOME_TOTAL, na.rm = TRUE)
+
+```
+
+```{r}
+summarize()?
+train_data$AMT_INCOME_TOTAL
+
+ggplot(train_data, aes(x = AMT_INCOME_TOTAL)) +
+  geom_histogram(binwidth = 5000, fill = "red", alpha = 0.7) +
+  labs(title = "Income Distribution", x = "Income", y = "Count")
+
+```
+
+```{r}
+# Converting categorical variables into factors
+train_data$CODE_GENDER <- as.factor(train_data$CODE_GENDER)
+
+# For models requiring dummy variables
+train_data <- model.matrix(~ CODE_GENDER + FLAG_OWN_CAR, data = train_data)
+
+```
+
+### **Additional Questions to Guide Exploration**
+
+Some questions you can explore during EDA include:
+
+-   Is the data balanced or imbalanced with respect to the target variable (loan default)?
+
+-   What are the relationships between key features (e.g., loan amount, income) and the target variable?
+
+-   Which features are the strongest predictors of loan default?
+
+-   Are there any significant data quality issues, such as missing or outlier values?
+
+-   Does the data need preprocessing, such as normalization or encoding of categorical variables?
+
+-   How are demographic variables (e.g., age, family status) related to loan default?
+
+-   What trends can be seen with credit amount, loan annuity, and income total?
+
+### **Data Description**
+
+Your dataset includes information about loan applicants, such as demographic information (e.g., age, gender), financial information (e.g., income, credit amount), and loan application details. The file `application_train.csv` is the primary dataset, and additional data files (such as `bureau.csv`) can be used to enrich the analysis by joining based on `SK_ID_CURR`.
+
+**Summary of the Data:**
+
+-   The dataset contains both numeric and categorical variables.
+
+-   Key variables include `AMT_CREDIT`, `AMT_INCOME_TOTAL`, `AMT_ANNUITY`, and `DAYS_BIRTH`.
+
+-   The target variable is `TARGET`, which indicates loan repayment status.
+
+### **Missing Data**
+
+During the data exploration, you might encounter missing values in several columns. For instance, columns related to property or financial information may have missing values for some applicants. Addressing missing data is crucial for accurate model development.
+
+**Proposed Solutions:**
+
+-   For columns with a significant portion of missing data (e.g., more than 50%), consider dropping these columns.
+
+-   For columns with fewer missing values, consider imputing with median or mean values (for numerical columns) or the most frequent value (for categorical columns).
+
+-   You can also consider more sophisticated imputation methods like k-nearest neighbors or predictive modeling.
+
+### **Findings and Discussion**
+
+Based on the initial analysis:
+
+-   The target variable (`TARGET`) is imbalanced, with a majority of applicants repaying their loans on time and a smaller proportion defaulting.
+
+-   Certain variables, such as `AMT_CREDIT` and `AMT_INCOME_TOTAL`, show potential for being strong predictors of loan default, based on their distribution and correlation with the target variable.
+
+-   There are some data quality issues, including missing values in multiple columns, especially those related to property ownership and financial records.
+
+-   The exploratory visualizations suggest that applicants with lower income or higher loan amounts might be at greater risk of defaulting on their loans.
